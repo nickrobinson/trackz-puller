@@ -1,16 +1,29 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+
+	"./stations"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
 //defina a default message handler
 var f MQTT.MessageHandler = func(client *MQTT.Client, msg MQTT.Message) {
-	fmt.Printf("TOPIC: %s\n", msg.Topic())
-	fmt.Printf("MSG: %s\n", msg.Payload())
+	var m stations.Stations
+	err := json.Unmarshal(msg.Payload(), &m)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	for i := 0; i < len(m.Stations); i++ {
+		fmt.Printf("SSID: %s\n", m.Stations[i].Ssid)
+		fmt.Printf("BSSID: %s\n", m.Stations[i].Bssid)
+		fmt.Printf("Signal: %d db\n\n", m.Stations[i].Signal)
+	}
+
 }
 
 func main() {
