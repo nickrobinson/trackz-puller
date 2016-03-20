@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"./stations"
+	"github.com/nickrobinson/trackz-puller/stations"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
