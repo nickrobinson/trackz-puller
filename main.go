@@ -44,6 +44,8 @@ func main() {
 		panic(token.Error())
 	}
 
+	log.Println("Client connected")
+
 	if token := client.Subscribe("/nickrobi/0001/aps", byte(0), f); token.Wait() && token.Error() != nil {
 		log.Println(token.Error())
 		os.Exit(1)
