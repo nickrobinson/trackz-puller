@@ -1,6 +1,6 @@
 package stations
 
-import "fmt"
+import "log"
 
 type StationInfo struct {
 	Ssid   string `json:"ssid"`
@@ -13,5 +13,5 @@ type Stations struct {
 }
 
 func init() {
-	fmt.Println("Initializing Stations")
+	log.Println("Initializing Stations")
 }

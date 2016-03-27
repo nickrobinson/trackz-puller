@@ -2,34 +2,42 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
+	"flag"
 
 	"github.com/nickrobinson/trackz-puller/stations"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"strconv"
 )
 
-//defina a default message handler
+//define a default message handler
 var f MQTT.MessageHandler = func(client *MQTT.Client, msg MQTT.Message) {
 	var m stations.Stations
 	err := json.Unmarshal(msg.Payload(), &m)
 	if err != nil {
-		fmt.Print(err)
+		log.Print(err)
 	}
 
 	for i := 0; i < len(m.Stations); i++ {
-		fmt.Printf("SSID: %s\n", m.Stations[i].Ssid)
-		fmt.Printf("BSSID: %s\n", m.Stations[i].Bssid)
-		fmt.Printf("Signal: %d db\n\n", m.Stations[i].Signal)
+		log.Printf("SSID: %s\n", m.Stations[i].Ssid)
+		log.Printf("BSSID: %s\n", m.Stations[i].Bssid)
+		log.Printf("Signal: %d db\n\n", m.Stations[i].Signal)
 	}
 
 }
 
 func main() {
+	var mqttServer = flag.String("server", "test.mosquitto.org", "MQTT Server to connect to")
+	var mqttPort = flag.Int("port", 1883, "MQTT Server Port")
+	var mqttClientId = flag.String("client", "testgoid", "MQTT Client Identifier")
+	flag.Parse()
+
+	log.SetOutput(os.Stderr)
 	opts := MQTT.NewClientOptions()
-	opts.AddBroker("tcp://mqtt.isengard.io:1883")
-	opts.SetClientID("testgoid")
+	opts.AddBroker("tcp://" + *mqttServer + ":" + strconv.Itoa(*mqttPort))
+	opts.SetClientID(*mqttClientId)
 
 	client := MQTT.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
@@ -37,7 +45,7 @@ func main() {
 	}
 
 	if token := client.Subscribe("/nickrobi/0001/aps", byte(0), f); token.Wait() && token.Error() != nil {
-		fmt.Println(token.Error())
+		log.Println(token.Error())
 		os.Exit(1)
 	}
 
